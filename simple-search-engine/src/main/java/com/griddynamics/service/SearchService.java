@@ -36,7 +36,6 @@ public final class SearchService {
 
 
     public static void loadData(String filePath) {
-
         String text = "";
 
         try {
@@ -44,7 +43,6 @@ public final class SearchService {
         } catch (IOException e) {
             System.out.println("Error while reading data");
         }
-
 
         data =  Arrays.stream(text.split("\n")).collect(Collectors.toList());
         invertedIndex = new InvertedIndex(data);
