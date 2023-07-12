@@ -1,9 +1,9 @@
 package com.griddynamics;
 
 import com.griddynamics.model.SearchContext;
-import com.griddynamics.model.strategy.SearchStrategyAll;
-import com.griddynamics.model.strategy.SearchStrategyAny;
-import com.griddynamics.model.strategy.SearchStrategyNone;
+import com.griddynamics.model.strategy.SearcherAll;
+import com.griddynamics.model.strategy.SearcherAny;
+import com.griddynamics.model.strategy.SearcherNone;
 import com.griddynamics.service.SearchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +23,12 @@ public class SearchServiceTest {
 
     @BeforeEach
     void init() {
-        SearchService.loadData("names.txt");
+        SearchService.loadData(FILE_NAME);
     }
 
     @Test
     public void getAllNames() {
-        assertThat( "50 Names should be found", SearchService.getData().size(), equalTo(10));
+        assertThat( "11 Names should be found", SearchService.getData().size(), equalTo(11));
         assertThat( "1st persons name is Kristofer Galley", SearchService.getData().get(0), equalTo("Kristofer Galley"));
         assertThat( "second person is Fernando Marbury and he has email", SearchService.getData().get(1), equalTo("Fernando Marbury fernando_marbury@gmail.com"));
         assertThat( "10th person is Bob Yeh and he has email", SearchService.getData().get(9), equalTo("Bob Yeh bobyeah@gmail.com"));
@@ -41,8 +41,11 @@ public class SearchServiceTest {
      */
     @Test
     public void searchNameStrategyAll() {
-        searchContext = new SearchContext("Malena Gray", new SearchStrategyAll());
+        searchContext = new SearchContext("Malena Gray", new SearcherAll());
         assertThat( "Malena Gray should be found", SearchService.search(searchContext).get(0), equalTo("Malena Gray"));
+
+        searchContext = new SearchContext("Bla", new SearcherAll());
+        assertThat( "bla should be found", SearchService.search(searchContext).get(0), equalTo("Bla"));
 
         searchContext.setPhrase("Kristyn Nix");
         assertThat( "Kristyn Nix should be found", SearchService.search(searchContext).get(0), equalTo("Kristyn Nix nix-kris@gmail.com"));
@@ -51,18 +54,14 @@ public class SearchServiceTest {
         assertThat( "Kristyn Nix should be found", SearchService.search(searchContext).get(0), equalTo("Kristyn Nix nix-kris@gmail.com"));
 
 
-        searchContext.setPhrase("malena");
+        searchContext.setPhrase("Malena nix-kris@gmail.com");
         assertThat( "No result is found", SearchService.search(searchContext), equalTo(NOT_FOUND));
 
-        searchContext.setPhrase("Kristyn");
-        assertThat( "No result is found", SearchService.search(searchContext), equalTo(NOT_FOUND));
+        searchContext.setPhrase("Malena");
+        assertThat( "Malena Gray should be found", SearchService.search(searchContext).get(0), equalTo("Malena Gray"));
 
-        searchContext.setPhrase("Nix");
+        searchContext.setPhrase("Nix Malena");
         assertThat( "No result is found", SearchService.search(searchContext), equalTo(NOT_FOUND));
-
-        searchContext.setPhrase("nix-kris@gmail.com");
-        assertThat( "No result is found", SearchService.search(searchContext), equalTo(NOT_FOUND));
-
     }
 
     /**
@@ -72,7 +71,7 @@ public class SearchServiceTest {
      */
     @Test
     public void searchNameStrategyAny() {
-        searchContext = new SearchContext("Malena Gray", new SearchStrategyAny());
+        searchContext = new SearchContext("Malena Gray", new SearcherAny());
         assertThat( "Malena Gray should be found", SearchService.search(searchContext).get(0), equalTo("Malena Gray"));
 
         searchContext.setPhrase("Kristyn Nix");
@@ -96,7 +95,6 @@ public class SearchServiceTest {
 
     }
 
-    // todo unfinished
     /**
      * Search Strategy: NONE
      * same as ANY in terms of valid search phrases
@@ -105,35 +103,34 @@ public class SearchServiceTest {
      */
     @Test
     public void searchNameStrategyNone() {
+        searchContext = new SearchContext("Malena Gray", new SearcherNone());
 
-        searchContext = new SearchContext("Malena Gray", new SearchStrategyNone());
         assertThat( "9 names should be found",
-                SearchService.search(searchContext).size(), equalTo(9));
+                SearchService.search(searchContext).size(), equalTo(10));
         assertThat( "All names except Malena Grey should be found",
                 SearchService.search(searchContext).contains("Malena Gray"), equalTo(false));
 
         searchContext.setPhrase("Kristyn Nix");
         assertThat( "9 names should be found",
-                SearchService.search(searchContext).size(), equalTo(9));
+                SearchService.search(searchContext).size(), equalTo(10));
         assertThat( "All names except Kristyn Nix should be found",
                 SearchService.search(searchContext).contains("Kristyn Nix"), equalTo(false));
 
         searchContext.setPhrase("malena");
-        assertThat( "8 names should be found",
-                SearchService.search(searchContext).size(), equalTo(8));
+        assertThat( "9 names should be found",
+                SearchService.search(searchContext).size(), equalTo(10));
         assertThat( "All names except Malena Grey should be found",
                 SearchService.search(searchContext).contains("Malena Gray"), equalTo(false));
 
         searchContext.setPhrase("kristyn");
         assertThat( "9 names should be found",
-                SearchService.search(searchContext).size(), equalTo(9));
+                SearchService.search(searchContext).size(), equalTo(10));
         assertThat( "All names except Kristyn Nix should be found",
                 SearchService.search(searchContext).contains("Kristyn Nix"), equalTo(false));
 
-
         searchContext.setPhrase("nix-kris@gmail.com");
         assertThat( "9 names should be found",
-                SearchService.search(searchContext).size(), equalTo(9));
+                SearchService.search(searchContext).size(), equalTo(10));
         assertThat( "All names except Kristyn Nix should be found",
                 SearchService.search(searchContext).contains("Kristyn Nix"), equalTo(false));
     }

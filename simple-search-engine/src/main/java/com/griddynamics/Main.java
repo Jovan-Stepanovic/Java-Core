@@ -1,31 +1,24 @@
 package com.griddynamics;
 
 import com.griddynamics.model.SearchContext;
-import com.griddynamics.model.strategy.SearchStrategyAll;
-import com.griddynamics.model.strategy.SearchStrategyAny;
-import com.griddynamics.model.strategy.SearchStrategyNone;
+import com.griddynamics.model.strategy.SearcherAll;
+import com.griddynamics.model.strategy.SearcherAny;
+import com.griddynamics.model.strategy.SearcherNone;
 import com.griddynamics.service.SearchService;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.griddynamics.util.Constants.*;
+
+// TODO: 7/12/23 create CliApplicationUi something like that...
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Scanner intScanner = new Scanner(System.in);
     private static boolean IS_RUNNING = true;
-    private static final String INCORRECT_OPTION = "\nIncorrect option! Try again.";
-    private static final String NAMES_PATH = "names.txt";
 
-    private static final String ANY = "ANY";
-    private static final String ALL = "ALL";
-    private static final String NONE = "NONE";
-
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
 //        String text = readFileAsString(NAMES_PATH);
         SearchService.loadData(NAMES_PATH);
@@ -65,9 +58,9 @@ public class Main {
         String strategy = scanner.nextLine();
 
         switch (strategy) {
-            case ANY -> context.setStrategy(new SearchStrategyAny());
-            case NONE -> context.setStrategy(new SearchStrategyNone());
-            case ALL -> context.setStrategy(new SearchStrategyAll());
+            case ANY -> context.setSearcher(new SearcherAny());
+            case NONE -> context.setSearcher(new SearcherNone());
+            case ALL -> context.setSearcher(new SearcherAll());
         }
 
         System.out.println("Enter a name or email to search all suitable people:");
