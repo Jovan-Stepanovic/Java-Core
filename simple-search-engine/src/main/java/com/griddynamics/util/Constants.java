@@ -8,7 +8,7 @@ public final class Constants {
     public static final String INCORRECT_OPTION = "\nIncorrect option! Try again.";
 
     // File Path to text file containing raw data
-    public static final String NAMES_PATH = "names.txt";
+    public static final String DATA_FILE_PATH = "names.txt";
 
     // Search strategies
     public static final String ANY = "ANY";
