@@ -24,6 +24,26 @@ public final class Repository {
         );
     }
 
+    private void updateIndex(Map<String, List<Integer>> index, String term, int posting) {
+        List<Integer> postingsList = index.getOrDefault(term, new ArrayList<>());
+        postingsList.add(posting);
+        index.put(term, postingsList);
+    }
+
+    private List<String> loadDataFromFile(String filePath) {
+        String rawData = readDataFromFileAsString(filePath);
+        return  Arrays.stream(rawData.split("\n")).collect(Collectors.toList());
+    }
+
+    private  String readDataFromFileAsString(String fileName)  {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        try(InputStream inputStream = classloader.getResourceAsStream(fileName)) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException | NullPointerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<String> queryAND(List<String> terms) {
         return getNamesFromPostings(getAllPostingsOperationAND(terms));
     }
@@ -67,26 +87,6 @@ public final class Repository {
 
     private List<Integer> getPostingsList(String term) {
         return invertedIndex.getOrDefault(term, new ArrayList<>());
-    }
-
-    private void updateIndex(Map<String, List<Integer>> index, String term, int posting) {
-        List<Integer> postingsList = index.getOrDefault(term, new ArrayList<>());
-        postingsList.add(posting);
-        index.put(term, postingsList);
-    }
-
-    public List<String> loadDataFromFile(String filePath) {
-        String rawData = readDataFromFileAsString(filePath);
-        return  Arrays.stream(rawData.split("\n")).collect(Collectors.toList());
-    }
-
-    private  String readDataFromFileAsString(String fileName)  {
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try(InputStream inputStream = classloader.getResourceAsStream(fileName)) {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException | NullPointerException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public List<String> getAllData() {
